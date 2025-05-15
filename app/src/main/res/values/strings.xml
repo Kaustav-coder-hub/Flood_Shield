@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">FloodShield</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="welcome_to_floodshield_home">Welcome to Home Page of FloodShield!</string>
+    <string name="welcome_to_floodshield_map">Welcome to Map Page of FloodShield!</string>
+    <string name="welcome_to_floodshield_alerts">Welcome to Alerts Page of FloodShield!</string>
+    <string name="welcome_to_floodshield_settings">Welcome to Settings Page of FloodShield!</string>
+    <string name="flood_map">Flood Map</string>
+    <string name="alerts">Alerts</string>
+    <string name="settings">Settings</string>
+    <string name="home">Home</string>
+    <string name="floodshield">FloodShield</string>
+</resources>
