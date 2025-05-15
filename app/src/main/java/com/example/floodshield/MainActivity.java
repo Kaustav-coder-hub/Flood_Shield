@@ -44,17 +44,25 @@ public class MainActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
 
-            if (id == R.id.nav_map) {
+            if (id == R.id.nav_home) {
+                // Load Home Fragment
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.content_frame, new HomeFragment())
+                        .commit();
+            }
+            else if (id == R.id.nav_map) {
                 // Load Map Fragment
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_frame, new MapFragment())
                         .commit();
-            } else if (id == R.id.nav_alerts) {
+            }
+            else if (id == R.id.nav_alerts) {
                 // Load Alerts Fragment
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_frame, new AlertFragment())
                         .commit();
-            } else if (id == R.id.nav_settings) {
+            }
+            else if (id == R.id.nav_settings) {
                 // Load Settings Fragment
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_frame, new SettingFragment())
