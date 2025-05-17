@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <title>Flood Risk Map</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Leaflet CSS/JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+    <style>
+        html, body, #map {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+
+<script>
+
+    // Add this at the end of the script section or in a new <script>
+  if (typeof AndroidBridge !== "undefined") {
+    // Show a toast
+    AndroidBridge.showToast("Map loaded and JS connected!");
+
+    // Request flood risk dynamically
+    AndroidBridge.requestRisk(22.57, 88.36);
+    AndroidBridge.requestRisk(21.62, 87.50); // Digha example
+  } else {
+    console.log("AndroidBridge not available");
+  }
+
+    var map = L.map('map').setView([22.57, 88.36], 7);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    L.tileLayer(
+  'https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=4a6f7c7bf2c9bed8361ddc1d815668d2',
+  {
+    opacity: 0.6,
+    attribution: '© OpenWeatherMap'
+  }
+).addTo(map);
+
+
+    // ✅ Embedded flood zone data instead of fetch
+    const data = [
+      {
+        "name": "Kolkata Zone 1",
+        "risk": "High",
+        "message": "Evacuate immediately.",
+        "coordinates": [
+          [22.58, 88.36],
+          [22.58, 88.38],
+          [22.56, 88.38],
+          [22.56, 88.36]
+        ]
+      },
+      {
+        "name": "Digha",
+        "risk": "Moderate",
+        "message": "Watch for water rise.",
+        "coordinates": [
+          [21.6276, 87.5011],
+          [21.6276, 87.5111],
+          [21.6176, 87.5111],
+          [21.6176, 87.5011]
+        ]
+      }
+    ];
+
+    // Draw each zone
+    data.forEach(zone => {
+      let color;
+      switch (zone.risk.toLowerCase()) {
+        case 'high': color = 'red'; break;
+        case 'moderate': color = 'orange'; break;
+        case 'low': color = 'green'; break;
+        default: color = 'gray';
+      }
+
+      L.polygon(zone.coordinates, { color: color })
+        .addTo(map)
+        .bindPopup(`<b>${zone.name}</b><br>Risk: ${zone.risk}<br>${zone.message}`);
+    });
+
+    // ✅ Java can call this to inject live point data
+    function addOrUpdatePoint(lat, lon, risk, rainfallMm) {
+  // 1. decide colour based on risk
+  const colour = risk === 'High' ? 'red'
+               : risk === 'Moderate' ? 'orange'
+               : 'green';
+
+  // 2. create or update the marker
+  const key = `${lat.toFixed(4)}_${lon.toFixed(4)}`;
+  if (!window.points) window.points = {};
+
+  if (window.points[key]) {
+      // update existing
+      window.points[key].setStyle({ color: colour });
+      window.points[key].setPopupContent(
+        `Rain: ${rainfallMm} mm<br>Risk: ${risk}`
+      );
+  } else {
+      // create new
+      window.points[key] = L.circleMarker([lat, lon], {
+        radius: 8,
+        color: colour,
+        fillOpacity: 0.8
+      })
+      .bindPopup(`Rain: ${rainfallMm} mm<br>Risk: ${risk}`)
+      .addTo(map);
+  }
+
+  // 3. **move/zoom the map to this point**
+  map.setView([lat, lon], 10, { animate: true });
+
+}
+
+</script>
+</body>
+</html>
